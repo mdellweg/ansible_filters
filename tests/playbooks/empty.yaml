@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  # collections:
+  #   - mdellweg.filters
+  gather_facts: false
+  vars:
+    positive_tests:
+      - false
+      - []
+      - {}
+      - ""
+    negative_tests:
+      - true
+      - [1, 2, 3]
+      - {"a": 4}
+      - "test"
+  tasks:
+    - name: Test empty test
+      assert:
+        that:
+          - item is mdellweg.filters.empty
+      loop: "{{ positive_tests }}"
+    - name: Test non-empty test
+      assert:
+        that:
+          - item is not mdellweg.filters.empty
+      loop: "{{ negative_tests }}"
+    - name: Test undefined is empty
+      assert:
+        that:
+          - undefined_variable is mdellweg.filters.empty
+...

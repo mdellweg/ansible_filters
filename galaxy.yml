@@ -1,0 +1,12 @@
+namespace: "mdellweg"
+name: "filters"
+authors:
+  - "Matthias Dellweg <2500@gmx.de>"
+version: "0.0.1-dev"
+license_file: LICENSE
+readme: README.md
+tags:
+  - empty
+  - jq
+  - json
+  - repr

@@ -1,0 +1,32 @@
+---
+- hosts: localhost
+  # collections:
+  #   - mdellweg.filters
+  gather_facts: false
+  vars:
+    tests:
+      - value: true
+        expr: '.'
+        result: true
+      - value: [1, 2, 3]
+        expr: '.[] + 1'
+        result: 2
+        all_result: [2, 3, 4]
+      - value: {"a": 1, "b": 2}
+        expr: 'keys'
+        result: ["a", "b"]
+  tasks:
+    - name: Test jq filter
+      assert:
+        that:
+          # - "{{ item.value | jq(item.expr) == item.result }}"
+          - "{{ item.value | mdellweg.filters.jq(item.expr) == item.result }}"
+      loop: "{{ tests }}"
+    - name: Test jq all filter
+      assert:
+        that:
+          # - "{{ item.value | jq(item.expr, all=True) == item.all_result }}"
+          - "{{ item.value | mdellweg.filters.jq(item.expr, all=True) == item.all_result }}"
+      loop: "{{ tests }}"
+      when: item.all_result is defined
+...

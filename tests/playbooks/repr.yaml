@@ -1,0 +1,28 @@
+---
+- hosts: localhost
+  # collections:
+  #   - mdellweg.filters
+  gather_facts: false
+  vars:
+    tests:
+      - value: true
+        result: "True"
+      - value: false
+        result: "False"
+      - value: test
+        result: "'test'"
+      - value: []
+        result: "[]"
+      - value: [1, "a", true]
+        result: "[1, 'a', True]"
+      - value: {"1": [], "a": true}
+        result: "{'1': [], 'a': True}"
+  tasks:
+    - name: Test repr filter
+      assert:
+        that:
+          # - "{{ item.value | repr == item.result }}"
+          - "{{ item.value | mdellweg.filters.repr == item.result }}"
+        fail_msg: "{{ item.value | mdellweg.filters.repr }} != {{ item.result }}"
+      loop: "{{ tests }}"
+...
