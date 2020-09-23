@@ -4,10 +4,17 @@
 
 from __future__ import absolute_import, division, print_function
 
-import jq
-from ansible.module_utils import six
-from ansible.module_utils._text import to_native, to_text
+try:
+    import jq
 
+    HAS_JQ = True
+except ImportError:
+    HAS_JQ = False
+
+from ansible.module_utils import six
+from ansible.module_utils.basic import missing_required_lib
+from ansible.module_utils._text import to_native, to_text
+from ansible.errors import AnsibleError
 
 __metaclass__ = type
 
@@ -16,6 +23,8 @@ def jq_filter(value, filter_expression, all=False):
     """
     Parse input with jq language.
     """
+    if not HAS_JQ:
+        raise AnsibleError(missing_required_lib("jq"))
     if all:
         return jq.all(filter_expression, value)
     else:
