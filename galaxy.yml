@@ -2,7 +2,7 @@ namespace: "mdellweg"
 name: "filters"
 authors:
   - "Matthias Dellweg <2500@gmx.de>"
-version: "0.0.2-dev"
+version: "0.0.2"
 license_file: LICENSE
 readme: README.md
 tags:
