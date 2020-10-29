@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  # collections:
+  #   - mdellweg.filters
+  gather_facts: false
+  vars:
+    tests:
+      - value: "1.2.3"
+        result: "1.2.3"
+      - value: "1.2.0"
+        result: "1.2.0"
+      - value: "0.2.0a0"
+        result: "0.2.0a0"
+      - value: "0.2.0a1.dev"
+        result: "0.2.0a1.dev0"
+      - value: "0.2.0a"
+        result: "0.2.0a0"
+      - value: "0.2.0a.dev"
+        result: "0.2.0a0.dev0"
+  tasks:
+    - name: Test canonical_semver filter
+      assert:
+        that:
+          - "{{ item.value | mdellweg.filters.canonical_semver == item.result }}"
+        fail_msg: "'{{ item.value }}' -> '{{item.value | mdellweg.filters.canonical_semver }}' != '{{ item.result }}'"
+      loop: "{{ tests }}"
+...
