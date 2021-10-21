@@ -1,0 +1,9 @@
+pytest
+pytest-xdist
+pytest-clarity; python_version >= '3.6'
+ansible_runner<2.0; python_version < '3.6'
+ansible_runner; python_version >= '3.6'
+-r requirements-lint.txt
+-r requirements.txt
+pylint==2.6.0; python_version >= '3.6'
+voluptuous==0.12.1 # from https://github.com/ansible/ansible/raw/devel/test/lib/ansible_test/_data/requirements/sanity.validate-modules.txt
