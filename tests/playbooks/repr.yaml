@@ -1,7 +1,5 @@
 ---
 - hosts: localhost
-  # collections:
-  #   - mdellweg.filters
   gather_facts: false
   vars:
     tests:
@@ -15,14 +13,22 @@
         result: "[]"
       - value: [1, "a", true]
         result: "[1, 'a', True]"
+    ambiguous_tests:
       - value: {"1": [], "a": true}
-        result: "{'1': [], 'a': True}"
+        results:
+          - "{'1': [], 'a': True}"
+          - "{'a': True, '1': []}"
   tasks:
     - name: Test repr filter
       assert:
         that:
-          # - "{{ item.value | repr == item.result }}"
           - "{{ item.value | mdellweg.filters.repr == item.result }}"
         fail_msg: "{{ item.value | mdellweg.filters.repr }} != {{ item.result }}"
       loop: "{{ tests }}"
+    - name: Test repr filter (ambiguous results)
+      assert:
+        that:
+          - "{{ item.value | mdellweg.filters.repr in item.results }}"
+        fail_msg: "{{ item.value | mdellweg.filters.repr }} not in {{ item.results }}"
+      loop: "{{ ambiguous_tests }}"
 ...
