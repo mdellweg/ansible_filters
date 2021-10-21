@@ -1,9 +1,1 @@
 jq
-ansible_runner
-flake8
-pylint
-pycodestyle
-voluptuous
-yamllint
-pytest>=4.4.0
-pytest-xdist
