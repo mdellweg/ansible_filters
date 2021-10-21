@@ -1,12 +1,16 @@
+---
 namespace: "mdellweg"
 name: "filters"
+description: "An Ansible collection of random filters I missed at some point."
 authors:
   - "Matthias Dellweg <2500@gmx.de>"
 version: "0.0.3-dev"
 license_file: LICENSE
 readme: README.md
+repository: https://github.com/mdellweg/ansible_filters
 tags:
   - empty
   - jq
   - json
   - repr
+...

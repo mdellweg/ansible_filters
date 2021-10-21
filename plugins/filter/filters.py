@@ -58,7 +58,7 @@ def repr_filter(value):
 
 def canonical_semver_filter(value):
     """
-    Represent a semantic version in a cononical form.
+    Represent a semantic version in a canonical form.
     """
     return to_text(str(parse_version(to_native(value))))
 
