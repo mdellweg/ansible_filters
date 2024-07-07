@@ -2,14 +2,12 @@
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
 
-from __future__ import absolute_import, division, print_function
-
-__metaclass__ = type
+import typing as t
 
 from jinja2.runtime import Undefined
 
 
-def empty_test(value):
+def empty_test(value: t.Any) -> bool:
     """
     Check whether a value is false or an empty string, list or dict.
     """
@@ -30,8 +28,8 @@ def empty_test(value):
     return False
 
 
-class TestModule(object):
-    def tests(self):
+class TestModule:
+    def tests(self) -> t.Dict[str, t.Callable]:
         return {
             "empty": empty_test,
         }
