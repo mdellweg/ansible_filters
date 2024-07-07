@@ -1,8 +1,7 @@
 # Copyright (c) 2020 Matthias Dellweg
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
 
-
-from __future__ import absolute_import, division, print_function
+import typing as t
 
 try:
     import jq
@@ -18,15 +17,13 @@ try:
 except ImportError:
     HAS_PACKAGING = False
 
-from ansible.errors import AnsibleError
+from ansible.errors import AnsibleError, AnsibleFilterError
 from ansible.module_utils import six
 from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.basic import missing_required_lib
 
-__metaclass__ = type
 
-
-def jq_filter(value, filter_expression, all=False):
+def jq_filter(value: t.Any, filter_expression: str, all: bool = False) -> t.Any:
     """
     Parse input with jq language.
     """
@@ -38,7 +35,7 @@ def jq_filter(value, filter_expression, all=False):
         return jq.first(filter_expression, value)
 
 
-def map_to_native(value):
+def map_to_native(value: t.Any) -> t.Any:
     if isinstance(value, six.string_types):
         return to_native(value)
     if isinstance(value, dict):
@@ -48,24 +45,76 @@ def map_to_native(value):
     return value
 
 
-def repr_filter(value):
+def repr_filter(value: t.Any) -> str:
     """
     Convert value into python representation string.
     """
     return to_text(repr(map_to_native(value)))
 
 
-def canonical_semver_filter(value):
+def canonical_semver_filter(value: str) -> str:
     """
     Represent a semantic version in a canonical form.
     """
     return to_text(str(parse_version(to_native(value))))
 
 
-class FilterModule(object):
-    def filters(self):
+def _assert_key(key: t.Any) -> str:
+    if not isinstance(key, str):
+        raise AnsibleFilterError("Dictionary keys need to be strings.")
+    if not key.isidentifier():
+        raise AnsibleFilterError("Dictionary keys need to be proper identifiers.")
+    return key
+
+
+def to_jaml(data: t.Any, level: int = 0, embed_in: str = "") -> str:
+    """Filter for Jinja 2 templates to render human readable YAML."""
+    # Don't even believe this is complete!
+    # Yes, I have checked pyyaml and ruamel.
+
+    nl = False
+    if isinstance(data, str):
+        result = f'"{data}"'
+    elif data is True:
+        result = "true"
+    elif data is False:
+        result = "false"
+    elif isinstance(data, int):
+        result = f"{data}"
+    elif isinstance(data, list):
+        if len(data):
+            nl = embed_in == "dict"
+            result = ("\n" + "  " * level).join(
+                ("-" + to_jaml(item, level + 1, "list") for item in data)
+            )
+        else:
+            result = "[]"
+    elif isinstance(data, dict):
+        if len(data):
+            nl = embed_in == "dict"
+            result = ("\n" + "  " * level).join(
+                (
+                    f"{_assert_key(key)}:" + to_jaml(value, level + 1, "dict")
+                    for key, value in sorted(data.items())
+                )
+            )
+        else:
+            result = "{}"
+    else:
+        raise AnsibleFilterError("This object is not serializable.")
+    if nl:
+        return "\n" + "  " * level + result
+    elif embed_in:
+        return " " + result
+    else:
+        return result
+
+
+class FilterModule:
+    def filters(self) -> t.Dict[str, t.Callable]:
         return {
             "canonical_semver": canonical_semver_filter,
             "jq": jq_filter,
             "repr": repr_filter,
+            "jaml": to_jaml,
         }

@@ -1,0 +1,43 @@
+---
+- hosts: "localhost"
+  # collections:
+  #   - "mdellweg.filters"
+  gather_facts: false
+  vars:
+    tests:
+      - value: true
+        result: "true"
+      - value: [1, 2, 3]
+        result: "- 1\n- 2\n- 3"
+      - value: {"a": 1, "b": 2}
+        result: "a: 1\nb: 2"
+      - value: {"a_123": "Test", "b": [], "c":[1, 2, "a"]}
+        result: "a_123: \"Test\"\nb: []\nc:\n  - 1\n  - 2\n  - \"a\""
+    embed_tests:
+      - value: "a"
+        level: 2
+        result: "\"a\""
+      - value: [1, 2]
+        level: 2
+        result: "- 1\n    - 2"
+      - value: [1, 2]
+        level: 2
+        embed_in: "dict"
+        result: "\n    - 1\n    - 2"
+      - value: [1, 2]
+        level: 2
+        embed_in: "list"
+        result: " - 1\n    - 2"
+  tasks:
+    - name: "Test jaml filter"
+      assert:
+        that:
+          # - "{{ item.value | jaml == item.result }}"
+          - "{{ item.value | mdellweg.filters.jaml == item.result }}"
+      loop: "{{ tests }}"
+    - name: "Test embedding jaml filter"
+      assert:
+        that:
+          - "{{ item.value | mdellweg.filters.jaml(level=item.level, embed_in=item.embed_in|default('')) == item.result }}"
+      loop: "{{ embed_tests }}"
+...
