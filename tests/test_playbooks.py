@@ -1,9 +1,9 @@
-import pytest
+import json
 import os
 import sys
-import json
-import ansible_runner
 
+import ansible_runner
+import pytest
 
 TEST_NAMES = [
     name[:-5] for name in os.listdir("tests/playbooks") if name.endswith(".yaml")
