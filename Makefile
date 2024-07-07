@@ -12,7 +12,7 @@ DEPENDENCIES := $(METADATA) $(foreach PLUGIN_TYPE,$(PLUGIN_TYPES),$(_$(PLUGIN_TY
 PYTHON_VERSION = $(shell python -c 'import sys; print("{}.{}".format(sys.version_info.major, sys.version_info.minor))')
 SANITY_OPTS =
 TEST =
-PYTEST = pytest -n 4 --boxed -v
+PYTEST = pytest -n 4 -v
 
 default: help
 help:
@@ -31,10 +31,16 @@ info:
 	@echo "  roles:\n $(foreach ROLE,$(notdir $(ROLES)),   - $(ROLE)\n)"
 	@echo " $(foreach PLUGIN_TYPE,$(PLUGIN_TYPES), $(PLUGIN_TYPE):\n $(foreach PLUGIN,$(basename $(notdir $(_$(PLUGIN_TYPE)))),   - $(PLUGIN)\n)\n)"
 
+format:
+	isort .
+	black .
+
 lint: $(MANIFEST)
 	yamllint -f parsable tests/playbooks
 	ansible-playbook --syntax-check tests/playbooks/*.yaml | grep -v '^$$'
-	black . --diff --check
+	black --check --diff .
+	isort -c --diff .
+	GALAXY_IMPORTER_CONFIG=tests/galaxy-importer.cfg python -m galaxy_importer.main $(NAMESPACE)-$(NAME)-$(VERSION).tar.gz
 	@echo "🙊 Code 🙉 LGTM 🙈"
 
 sanity: $(MANIFEST)
@@ -47,9 +53,8 @@ test: $(MANIFEST)
 test_%: FORCE $(MANIFEST)
 	pytest -v 'tests/test_playbooks.py::test_playbook[$*]'
 
-test-setup: requirements-dev.txt
-	pip install --upgrade pip
-	pip install --upgrade -r requirements-dev.txt
+test-setup: requirements.txt
+	pip install -r requirements.txt
 
 $(MANIFEST): $(NAMESPACE)-$(NAME)-$(VERSION).tar.gz
 	ansible-galaxy collection install -p build/collections $< --force
@@ -72,4 +77,4 @@ clean:
 
 FORCE:
 
-.PHONY: help dist install lint sanity test test-setup publish FORCE
+.PHONY: help dist install format lint sanity test test-setup publish FORCE

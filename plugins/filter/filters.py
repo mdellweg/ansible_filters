@@ -18,11 +18,10 @@ try:
 except ImportError:
     HAS_PACKAGING = False
 
-from ansible.module_utils import six
-from ansible.module_utils.basic import missing_required_lib
-from ansible.module_utils._text import to_native, to_text
 from ansible.errors import AnsibleError
-
+from ansible.module_utils import six
+from ansible.module_utils._text import to_native, to_text
+from ansible.module_utils.basic import missing_required_lib
 
 __metaclass__ = type
 
