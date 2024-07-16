@@ -67,6 +67,10 @@ def _assert_key(key: t.Any) -> str:
     return key
 
 
+def _quote(string: str) -> str:
+    return '"' + string.replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
 def to_jaml(data: t.Any, level: int = 0, embed_in: str = "") -> str:
     """Filter for Jinja 2 templates to render human readable YAML."""
     # Don't even believe this is complete!
@@ -74,7 +78,7 @@ def to_jaml(data: t.Any, level: int = 0, embed_in: str = "") -> str:
 
     nl = False
     if isinstance(data, str):
-        result = f'"{data}"'
+        result = _quote(data)
     elif data is True:
         result = "true"
     elif data is False:

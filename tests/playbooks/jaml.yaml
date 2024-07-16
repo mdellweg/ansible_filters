@@ -13,6 +13,8 @@
         result: "a: 1\nb: 2"
       - value: {"a_123": "Test", "b": [], "c":[1, 2, "a"]}
         result: "a_123: \"Test\"\nb: []\nc:\n  - 1\n  - 2\n  - \"a\""
+      - value: asdf "TEST" gjkl
+        result: "\"asdf \\\"TEST\\\" gjkl\""
     embed_tests:
       - value: "a"
         level: 2
