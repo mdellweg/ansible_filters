@@ -73,7 +73,7 @@ publish: $(NAMESPACE)-$(NAME)-$(VERSION).tar.gz
 	ansible-galaxy collection publish --api-key $(GALAXY_API_KEY) $<
 
 clean:
-	rm -rf build
+	rm -rf build importer_result.json
 
 FORCE:
 
