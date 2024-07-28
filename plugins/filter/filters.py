@@ -21,6 +21,7 @@ from ansible.errors import AnsibleError, AnsibleFilterError
 from ansible.module_utils import six
 from ansible.module_utils._text import to_native, to_text
 from ansible.module_utils.basic import missing_required_lib
+from ansible.utils.display import Display
 
 
 def jq_filter(value: t.Any, filter_expression: str, all: bool = False) -> t.Any:
@@ -108,10 +109,16 @@ def to_jaml(data: t.Any, level: int = 0, embed_in: str = "") -> str:
         raise AnsibleFilterError("This object is not serializable.")
     if nl:
         return "\n" + "  " * level + result
-    elif embed_in:
+    elif embed_in in ("dict", "list"):
         return " " + result
-    else:
+    elif embed_in == "document":
+        if level != 0:
+            Display().warning("jaml: Level should be 0 when embedding in 'document'.")
         return result
+    else:
+        if level != 0:
+            Display().warning("jaml: Level should be 0 when serializing a docoment.")
+        return "---\n" + result + "\n...\n"
 
 
 class FilterModule:
